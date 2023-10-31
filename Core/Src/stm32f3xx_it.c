@@ -6,12 +6,13 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
-  * All rights reserved.
+  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
+  * All rights reserved.</center></h2>
   *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
   *
   ******************************************************************************
   */
@@ -72,9 +73,7 @@ void NMI_Handler(void)
 
   /* USER CODE END NonMaskableInt_IRQn 0 */
   /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
-  while (1)
-  {
-  }
+
   /* USER CODE END NonMaskableInt_IRQn 1 */
 }
 
@@ -185,7 +184,7 @@ void SysTick_Handler(void)
   /* USER CODE BEGIN SysTick_IRQn 0 */
 
   /* USER CODE END SysTick_IRQn 0 */
-  HAL_IncTick();
+
   /* USER CODE BEGIN SysTick_IRQn 1 */
 
   /* USER CODE END SysTick_IRQn 1 */
@@ -199,60 +198,20 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles DMA1 channel2 global interrupt.
+  * @brief This function handles DMA1 channel7 global interrupt.
   */
-void DMA1_Channel2_IRQHandler(void)
+void DMA1_Channel7_IRQHandler(void)
 {
-  /* USER CODE BEGIN DMA1_Channel2_IRQn 0 */
+	if(LL_DMA_IsActiveFlag_TC7(DMA1) == SET)
+	{
+		LL_DMA_ClearFlag_TC7(DMA1);
 
-  /* USER CODE END DMA1_Channel2_IRQn 0 */
-
-  /* USER CODE BEGIN DMA1_Channel2_IRQn 1 */
-
-  /* USER CODE END DMA1_Channel2_IRQn 1 */
-}
-
-/**
-  * @brief This function handles DMA1 channel6 global interrupt.
-  */
-void DMA1_Channel6_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA1_Channel6_IRQn 0 */
-
-  /* USER CODE END DMA1_Channel6_IRQn 0 */
-
-  /* USER CODE BEGIN DMA1_Channel6_IRQn 1 */
-
-  /* USER CODE END DMA1_Channel6_IRQn 1 */
-}
-
-/**
-  * @brief This function handles I2C1 event global interrupt / I2C1 wake-up interrupt through EXT line 23.
-  */
-void I2C1_EV_IRQHandler(void)
-{
-  /* USER CODE BEGIN I2C1_EV_IRQn 0 */
-
-  /* USER CODE END I2C1_EV_IRQn 0 */
-
-  /* USER CODE BEGIN I2C1_EV_IRQn 1 */
-
-  /* USER CODE END I2C1_EV_IRQn 1 */
-}
-
-/**
-  * @brief This function handles USART2 global interrupt / USART2 wake-up interrupt through EXT line 26.
-  */
-void USART2_IRQHandler(void)
-{
-  /* USER CODE BEGIN USART2_IRQn 0 */
-
-  /* USER CODE END USART2_IRQn 0 */
-  /* USER CODE BEGIN USART2_IRQn 1 */
-
-  /* USER CODE END USART2_IRQn 1 */
+		while(LL_USART_IsActiveFlag_TC(USART2) == RESET);
+		LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_7);
+	}
 }
 
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
