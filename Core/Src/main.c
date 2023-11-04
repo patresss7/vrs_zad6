@@ -66,6 +66,7 @@ int main(void)
   MX_USART2_UART_Init();
 
   USART2_RegisterCallback(proccesDmaData);
+  USART2_PutBuffer("start", strlen("start"));
   uint8_t hts_good = hts221_init();
 
   uint8_t *buffer;
