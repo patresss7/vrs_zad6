@@ -27,6 +27,7 @@
 #include "dma.h"
 #include "string.h"
 #include "../Drivers/HTS221/HTS221.h"
+#include "../Drivers/LP22HB/LP22HB.h"
 
 // I2C slave device useful information
 #define 	LSM6DSL_DEVICE_ADDRESS		0xD7U
@@ -48,7 +49,7 @@ int messageBufferIndex = 0;
 letter_count_ thisLetterCount;
 char messageToBeSent[128] = {'a','a','\0'};
 char statusMessage[128];
-float temp,humid;
+float temp,humid,pressure,altitude;
 
 
 int main(void)
@@ -68,9 +69,29 @@ int main(void)
   USART2_RegisterCallback(proccesDmaData);
   USART2_PutBuffer("start", strlen("start"));
   uint8_t hts_good = hts221_init();
+  uint8_t lp_good = lps25hb_init();
 
   uint8_t *buffer;
   uint8_t len = 0;
+
+  if(hts_good)
+  {
+	  USART2_PutBuffer("HTS good", strlen("HTS good"));
+  }
+  else
+  {
+	  USART2_PutBuffer("HTS bad", strlen("HTS bad"));
+  }
+
+  if(lp_good)
+  {
+	  USART2_PutBuffer("LP good", strlen("LP good"));
+
+  }
+  else
+  {
+	  USART2_PutBuffer("LP bad", strlen("LP bad"));
+  }
 
   while (1)
   {
@@ -79,28 +100,18 @@ int main(void)
 //		  LL_GPIO_TogglePin(GPIOB, LL_GPIO_PIN_3);
 //	  }
 
-	  if(hts_good)
-	  {
-		  USART2_PutBuffer("HTS good", strlen("HTS good"));
-		  temp = hts221_read_temp();
-		  humid = hts221_read_humid();
-	  }
-	  else
-	  {
-		  USART2_PutBuffer("HTS bad", strlen("HTS bad"));
-		  temp = 0;
-	  }
+
+	  temp = hts221_read_temp();
+	  humid = hts221_read_humid();
+	  pressure = lps25hb_read_pressure();
+	  altitude = lps25hb_read_altitude();
+
 
 	  buffer = malloc(32*sizeof(uint8_t));
-	  len = sprintf(buffer, "%f,%f\n", temp, humid);
+	  len = sprintf(buffer, "%2.1f,%2f,%4.2f,%3.2f\n", temp, humid);
 	  USART2_PutBuffer(buffer,len);
 	  free(buffer);
 
-		  LL_GPIO_TogglePin(GPIOB, LL_GPIO_PIN_3);
-		  USART2_PutBuffer((uint8_t*)messageToBeSent, sizeof(messageToBeSent));
-
-	  USART2_PutBuffer((uint8_t*)messageToBeSent, sizeof(messageToBeSent));
-	  LL_mDelay(100);
   }
 }
 
