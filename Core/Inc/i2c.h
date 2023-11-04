@@ -37,7 +37,15 @@
 void MX_I2C1_Init(void);
 /* USER CODE BEGIN Prototypes */
 uint8_t i2c_master_read_byte(uint8_t slave_address, uint8_t register_address);
+
 /* USER CODE END Prototypes */
+void I2C_IRQHandler(void);
+
+void read_multi_byte(uint8_t *data, uint8_t len, uint8_t slave_address, uint8_t register_address);
+void write_multi_byte(uint8_t *data, uint8_t len, uint8_t slave_address, uint8_t register_address);
+
+
+
 
 #ifdef __cplusplus
 }

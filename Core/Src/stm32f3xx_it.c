@@ -22,6 +22,7 @@
 #include "main.h"
 #include "usart.h"
 #include "stm32f3xx_it.h"
+#include "i2c.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -201,6 +202,11 @@ void SysTick_Handler(void)
 /**
   * @brief This function handles DMA1 channel6 global interrupt.
   */
+void I2C1_EV_IRQHandler(void)
+{
+	I2C_IRQHandler();
+}
+
 void DMA1_Channel6_IRQHandler(void)
 {
 	if(LL_DMA_IsActiveFlag_TC6(DMA1) == SET)

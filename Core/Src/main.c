@@ -26,6 +26,7 @@
 #include "usart.h"
 #include "dma.h"
 #include "string.h"
+#include "../Drivers/HTS221/HTS221.h"
 
 // I2C slave device useful information
 #define 	LSM6DSL_DEVICE_ADDRESS		0xD7U
@@ -47,6 +48,7 @@ int messageBufferIndex = 0;
 letter_count_ thisLetterCount;
 char messageToBeSent[128] = {'a','a','\0'};
 char statusMessage[128];
+float temp,humid;
 
 
 int main(void)
@@ -64,6 +66,10 @@ int main(void)
   MX_USART2_UART_Init();
 
   USART2_RegisterCallback(proccesDmaData);
+  uint8_t hts_good = hts221_init();
+
+  uint8_t *buffer;
+  uint8_t len = 0;
 
   while (1)
   {
@@ -71,6 +77,23 @@ int main(void)
 //	  {
 //		  LL_GPIO_TogglePin(GPIOB, LL_GPIO_PIN_3);
 //	  }
+
+	  if(hts_good)
+	  {
+		  USART2_PutBuffer("HTS good", strlen("HTS good"));
+		  temp = hts221_read_temp();
+		  humid = hts221_read_humid();
+	  }
+	  else
+	  {
+		  USART2_PutBuffer("HTS bad", strlen("HTS bad"));
+		  temp = 0;
+	  }
+
+	  buffer = malloc(32*sizeof(uint8_t));
+	  len = sprintf(buffer, "%f,%f\n", temp, humid);
+	  USART2_PutBuffer(buffer,len);
+	  free(buffer);
 
 		  LL_GPIO_TogglePin(GPIOB, LL_GPIO_PIN_3);
 		  USART2_PutBuffer((uint8_t*)messageToBeSent, sizeof(messageToBeSent));
