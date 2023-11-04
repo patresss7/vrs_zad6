@@ -6,6 +6,8 @@
  */
 
 #include "LP22HB.h"
+#include "i2c.h"
+#include <math.h>
 
 
 uint8_t actual_address = LPS25HB_I2C_ADDRESS_0;

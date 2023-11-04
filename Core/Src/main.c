@@ -108,7 +108,7 @@ int main(void)
 
 
 	  buffer = malloc(32*sizeof(uint8_t));
-	  len = sprintf(buffer, "%2.1f,%2f,%4.2f,%3.2f\n", temp, humid);
+	  len = sprintf(buffer, "%05.1f,%02.0f,%07.2f,%06.2f\n", temp, humid, pressure, altitude);
 	  USART2_PutBuffer(buffer,len);
 	  free(buffer);
 
