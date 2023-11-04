@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "usart.h"
 #include "stm32f3xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -198,6 +199,23 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+  * @brief This function handles DMA1 channel6 global interrupt.
+  */
+void DMA1_Channel6_IRQHandler(void)
+{
+	if(LL_DMA_IsActiveFlag_TC6(DMA1) == SET)
+	{
+		USART2_CheckDmaReception();
+		LL_DMA_ClearFlag_TC6(DMA1);
+	}
+	else if(LL_DMA_IsActiveFlag_HT6(DMA1) == SET)
+	{
+		USART2_CheckDmaReception();
+		LL_DMA_ClearFlag_HT6(DMA1);
+	}
+}
+
+/**
   * @brief This function handles DMA1 channel7 global interrupt.
   */
 void DMA1_Channel7_IRQHandler(void)
@@ -211,6 +229,17 @@ void DMA1_Channel7_IRQHandler(void)
 	}
 }
 
+/**
+  * @brief This function handles USART2 global interrupt.
+  */
+void USART2_IRQHandler(void)
+{
+	if(LL_USART_IsActiveFlag_IDLE(USART2))
+	{
+		USART2_CheckDmaReception();
+		LL_USART_ClearFlag_IDLE(USART2);
+	}
+}
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */

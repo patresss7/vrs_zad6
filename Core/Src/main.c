@@ -22,6 +22,10 @@
 #include "main.h"
 #include "i2c.h"
 #include "gpio.h"
+#include "string.h"
+#include "usart.h"
+#include "dma.h"
+#include "string.h"
 
 // I2C slave device useful information
 #define 	LSM6DSL_DEVICE_ADDRESS		0xD7U
@@ -30,6 +34,19 @@
 
 
 void SystemClock_Config(void);
+
+
+#define START_SIGN 	'#'
+#define END_SIGN	'$'
+#define MAX_MSG_LEN	35
+
+int processedSignsCount = 0;
+uint8_t transimissionEnabled = 0;
+char messageBuffer[MAX_MSG_LEN];
+int messageBufferIndex = 0;
+letter_count_ thisLetterCount;
+char messageToBeSent[128] = {'a','a','\0'};
+char statusMessage[128];
 
 
 int main(void)
@@ -43,14 +60,22 @@ int main(void)
 
   MX_GPIO_Init();
   MX_I2C1_Init();
+  MX_DMA_Init();
+  MX_USART2_UART_Init();
+
+  USART2_RegisterCallback(proccesDmaData);
 
   while (1)
   {
-	  if(i2c_master_read_byte(LSM6DSL_DEVICE_ADDRESS, LSM6DSL_WHO_AM_I_ADDRES) == LSM6DSL_WHO_AM_I_VALUE)
-	  {
-		  LL_GPIO_TogglePin(GPIOB, LL_GPIO_PIN_3);
-	  }
+//	  if(i2c_master_read_byte(LSM6DSL_DEVICE_ADDRESS, LSM6DSL_WHO_AM_I_ADDRES) == LSM6DSL_WHO_AM_I_VALUE)
+//	  {
+//		  LL_GPIO_TogglePin(GPIOB, LL_GPIO_PIN_3);
+//	  }
 
+		  LL_GPIO_TogglePin(GPIOB, LL_GPIO_PIN_3);
+		  USART2_PutBuffer((uint8_t*)messageToBeSent, sizeof(messageToBeSent));
+
+	  USART2_PutBuffer((uint8_t*)messageToBeSent, sizeof(messageToBeSent));
 	  LL_mDelay(100);
   }
 }
@@ -90,6 +115,53 @@ void SystemClock_Config(void)
   LL_SYSTICK_SetClkSource(LL_SYSTICK_CLKSOURCE_HCLK);
   LL_SetSystemCoreClock(8000000);
   LL_RCC_SetI2CClockSource(LL_RCC_I2C1_CLKSOURCE_HSI);
+}
+
+void proccesDmaData(uint8_t sign)
+{
+	if(transimissionEnabled)
+		{
+			if(sign >= 'a' && sign <= 'z')
+			{
+				thisLetterCount.small_letter++;
+				processedSignsCount++;
+				messageBuffer[messageBufferIndex++] = sign;
+			}
+			else if(sign >= 'A' && sign <= 'Z')
+			{
+				thisLetterCount.capital_letter++;
+				processedSignsCount++;
+				messageBuffer[messageBufferIndex++] = sign;
+			}
+			else if(sign == END_SIGN)
+			{
+				transimissionEnabled = 0;
+				processedSignsCount = 0;
+				sprintf(messageToBeSent,"Valid string: %s, lower-case: %d, upper-case: %d \r\n",messageBuffer,thisLetterCount.small_letter,thisLetterCount.capital_letter);
+				thisLetterCount.small_letter = 0;
+				thisLetterCount.capital_letter = 0;
+				memset(messageBuffer, 0, MAX_MSG_LEN);
+				messageBufferIndex = 0;
+			}
+			else
+			{
+				processedSignsCount++;
+				messageBuffer[messageBufferIndex++] = sign;
+			}
+		}
+		if(processedSignsCount > MAX_MSG_LEN)
+		{
+			transimissionEnabled = 0;
+			processedSignsCount = 0;
+			thisLetterCount.small_letter = 0;
+			thisLetterCount.capital_letter = 0;
+			memset(messageBuffer, 0, MAX_MSG_LEN);
+			messageBufferIndex = 0;
+		}
+		if(sign == START_SIGN)
+		{
+			transimissionEnabled = 1;
+		}
 }
 
 
