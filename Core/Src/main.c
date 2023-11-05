@@ -83,6 +83,8 @@ int main(void)
 	  USART2_PutBuffer("HTS bad", strlen("HTS bad"));
   }
 
+  LL_mDelay(100);
+
   if(lp_good)
   {
 	  USART2_PutBuffer("LP good", strlen("LP good"));
@@ -101,8 +103,8 @@ int main(void)
 //	  }
 
 
-	  temp = hts221_read_temp();
-	  humid = hts221_read_humid();
+	  temp = hts221_get_temperature();
+	  humid = hts221_get_humidity();
 	  pressure = lps25hb_read_pressure();
 	  altitude = lps25hb_read_altitude();
 
@@ -112,6 +114,7 @@ int main(void)
 	  USART2_PutBuffer(buffer,len);
 	  free(buffer);
 
+	  LL_mDelay(10);
   }
 }
 
