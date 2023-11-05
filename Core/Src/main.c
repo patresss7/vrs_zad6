@@ -114,7 +114,7 @@ int main(void)
 	  USART2_PutBuffer(buffer,len);
 	  free(buffer);
 
-	  LL_mDelay(1000);
+	  LL_mDelay(10);
   }
 }
 
