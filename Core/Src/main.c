@@ -67,16 +67,16 @@ int main(void)
   MX_USART2_UART_Init();
 
   USART2_RegisterCallback(proccesDmaData);
-  USART2_PutBuffer("start", strlen("start"));
+  USART2_PutBuffer("start\n", strlen("start\n"));
   uint8_t hts_good = hts221_init();
-  uint8_t lp_good = lps25hb_init();
+  uint8_t lp_good = lp22hb_init();
 
   uint8_t *buffer;
   uint8_t len = 0;
 
   if(hts_good)
   {
-	  USART2_PutBuffer("HTS good", strlen("HTS good"));
+	  USART2_PutBuffer("HTS good\n", strlen("HTS good\n"));
   }
   else
   {
@@ -87,7 +87,7 @@ int main(void)
 
   if(lp_good)
   {
-	  USART2_PutBuffer("LP good", strlen("LP good"));
+	  USART2_PutBuffer("LP good\n", strlen("LP good\n"));
 
   }
   else
@@ -105,8 +105,8 @@ int main(void)
 
 	  temp = hts221_get_temperature();
 	  humid = hts221_get_humidity();
-	  pressure = lps25hb_read_pressure();
-	  altitude = lps25hb_read_altitude();
+	  pressure = lp22hb_get_pressure();
+	  altitude = lp22hb_calculate_altitude(pressure);
 
 
 	  buffer = malloc(32*sizeof(uint8_t));
@@ -114,7 +114,7 @@ int main(void)
 	  USART2_PutBuffer(buffer,len);
 	  free(buffer);
 
-	  LL_mDelay(10);
+	  LL_mDelay(1000);
   }
 }
 
