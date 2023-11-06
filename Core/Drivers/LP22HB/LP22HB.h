@@ -26,8 +26,10 @@ void lp22hb_write_bytes(uint8_t *data, uint8_t reg_address, uint8_t len);
 void lp22hb_read_bytes(uint8_t register_address, uint8_t *data, uint8_t len, uint8_t i2c_address);
 
 uint8_t lp22hb_init();
+uint8_t lp22hb_init_multi();
 
 float lp22hb_get_pressure();
+float lp22hb_get_pressure_multi();
 float lp22hb_calculate_altitude(float pressure);
 
 

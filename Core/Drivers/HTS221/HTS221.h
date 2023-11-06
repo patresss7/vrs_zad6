@@ -42,9 +42,13 @@ void hts221_write_byte(uint8_t reg_address, uint8_t *data,uint8_t len);
 uint8_t hts221_read_byte(uint8_t reg_address);
 
 uint8_t hts221_init();
+uint8_t hts221_init_multi();
 
 float hts221_get_temperature();
 float hts221_get_humidity();
+
+float hts221_get_temperature_multi();
+float hts221_get_humidity_multi();
 
 
 

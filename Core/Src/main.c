@@ -28,6 +28,9 @@
 #include "string.h"
 #include "../Drivers/HTS221/HTS221.h"
 #include "../Drivers/LP22HB/LP22HB.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 
 // I2C slave device useful information
 #define 	LSM6DSL_DEVICE_ADDRESS		0xD7U
@@ -41,6 +44,9 @@ void SystemClock_Config(void);
 #define START_SIGN 	'#'
 #define END_SIGN	'$'
 #define MAX_MSG_LEN	35
+
+//#define SINGLE
+#define MULTI
 
 int processedSignsCount = 0;
 uint8_t transimissionEnabled = 0;
@@ -68,8 +74,16 @@ int main(void)
 
   USART2_RegisterCallback(proccesDmaData);
   USART2_PutBuffer("start\n", strlen("start\n"));
+
+#ifdef SINGLE
   uint8_t hts_good = hts221_init();
   uint8_t lp_good = lp22hb_init();
+#endif
+
+#ifdef MULTI
+  uint8_t hts_good = hts221_init_multi();
+  uint8_t lp_good = lp22hb_init_multi();
+#endif
 
   uint8_t *buffer;
   uint8_t len = 0;
@@ -102,12 +116,19 @@ int main(void)
 //		  LL_GPIO_TogglePin(GPIOB, LL_GPIO_PIN_3);
 //	  }
 
-
+#ifdef SINGLE
 	  temp = hts221_get_temperature();
 	  humid = hts221_get_humidity();
 	  pressure = lp22hb_get_pressure();
 	  altitude = lp22hb_calculate_altitude(pressure);
+#endif
 
+#ifdef MULTI
+	  temp = hts221_get_temperature_multi();
+	  humid = hts221_get_humidity_multi();
+	  pressure = lp22hb_get_pressure();
+	  altitude = lp22hb_calculate_altitude(pressure);
+#endif
 
 	  buffer = malloc(32*sizeof(uint8_t));
 	  len = sprintf(buffer, "%05.1f,%02.0f,%07.2f,%06.2f\n", temp, humid, pressure, altitude);
